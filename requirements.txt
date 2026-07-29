@@ -1,0 +1,4 @@
+# Requirements for Space Shooter Game
+# pygame-ce (Community Edition) is recommended as it has performance improvements
+# and active updates. It is fully backward compatible with pygame.
+pygame-ce>=2.4.0
