@@ -46,6 +46,9 @@ class SoundManager:
                 self.sounds['hit'] = self._synth_hit()
                 self.sounds['powerup'] = self._synth_powerup()
                 self.sounds['boss_alarm'] = self._synth_boss_alarm()
+                self.sounds['bg_music'] = self._synth_bg_music()
+                self.sounds['bg_music'].set_volume(0.22)
+                self.sounds['bg_music'].play(loops=-1)
             except Exception as e:
                 print(f"[Warning] Failed to synthesize sounds ({e}). Running in silent mode.")
                 self.enabled = False
@@ -144,6 +147,55 @@ class SoundManager:
             freq = 440 if int(t * 10) % 2 == 0 else 330
             val = int(16000 * math.sin(2 * math.pi * freq * t) * (1.0 - t/duration))
             buf[i] = val
+        return pygame.mixer.Sound(buffer=buf)
+
+    def _synth_bg_music(self):
+        mixer_settings = pygame.mixer.get_init()
+        sr = mixer_settings[0] if mixer_settings else 22050
+        duration = 16.0
+        n = int(sr * duration)
+        buf = array.array('h', [0] * n)
+        
+        notes = [130.81, 155.56, 196.00, 233.08, 261.63, 311.13, 392.00, 466.16,
+                 466.16, 392.00, 311.13, 261.63, 233.08, 196.00, 155.56, 130.81]
+        
+        step_duration = 0.25
+        
+        for i in range(n):
+            t = i / sr
+            step = int(t / step_duration)
+            note_idx = step % len(notes)
+            freq = notes[note_idx]
+            
+            bar = int(t / 4.0) % 4
+            if bar == 0:
+                pass
+            elif bar == 1:
+                freq = freq * (207.65 / 196.00)
+            elif bar == 2:
+                freq = freq * (174.61 / 196.00)
+            elif bar == 3:
+                freq = freq * (196.00 / 196.00)
+                
+            t_step = t - (step * step_duration)
+            vibrato = 1.0 + 0.015 * math.sin(2 * math.pi * 6 * t)
+            phase = 2 * math.pi * freq * vibrato * t_step
+            env = math.exp(-6.0 * t_step)
+            
+            wave = math.sin(phase)
+            wave += 0.5 * math.sin(phase * 0.5)
+            wave += 0.25 * math.sin(phase * 1.5)
+            
+            val = int(4500 * wave * env)
+            
+            bass_freqs = [65.41, 51.91, 43.65, 49.00]
+            bass_freq = bass_freqs[bar]
+            bass_wave = math.sin(2 * math.pi * bass_freq * t)
+            bass_pulse = 0.5 + 0.5 * math.sin(2 * math.pi * 0.25 * t)
+            val += int(1500 * bass_wave * bass_pulse)
+            
+            buf[i] = max(-32768, min(32767, val))
+            
         return pygame.mixer.Sound(buffer=buf)
 
     def play(self, name):
@@ -485,7 +537,7 @@ class Player:
 
         self.invincibility_time = 0
         self.angle_tilt = 0.0  # visual banking angle
-        self.radius = 16       # collision box radius
+        self.radius = 20       # collision box radius
 
     def get_hit(self, damage, particles):
         if self.invincibility_time > 0:
@@ -696,12 +748,12 @@ class ScoutEnemy(Enemy):
         super().__init__(
             x=random.randint(100, WIDTH - 100),
             y=-50,
-            hp=15,
-            speed=3.2,
+            hp=10,
+            speed=2.4,
             color=MAGENTA,
             points=100
         )
-        self.radius = 13
+        self.radius = 11
         self.wave_width = random.uniform(4.0, 7.0)
         self.wave_freq = random.uniform(0.04, 0.07)
         self.start_x = self.x
@@ -748,12 +800,12 @@ class StrikerEnemy(Enemy):
         super().__init__(
             x=random.randint(80, WIDTH - 80),
             y=-50,
-            hp=25,
-            speed=2.2,
+            hp=18,
+            speed=1.6,
             color=RED,
             points=200
         )
-        self.radius = 16
+        self.radius = 14
         self.shoot_delay = random.randint(70, 110)
         self.shoot_cooldown = random.randint(20, 60)
 
@@ -809,8 +861,8 @@ class CruiserEnemy(Enemy):
         super().__init__(
             x=random.randint(120, WIDTH - 120),
             y=-70,
-            hp=60,
-            speed=1.0,
+            hp=35,
+            speed=0.8,
             color=YELLOW,
             points=400
         )
@@ -860,8 +912,8 @@ class BossEnemy(Enemy):
         super().__init__(
             x=WIDTH // 2,
             y=-150,
-            hp=1200,
-            speed=0.6,
+            hp=600,
+            speed=0.4,
             color=RED,
             points=3000
         )
@@ -1084,18 +1136,17 @@ class GameEngine:
 
     def load_sprites(self):
         sizes = {
-            'player': (48, 48),
-            'scout': (40, 40),
-            'striker': (48, 48),
+            'player': (64, 64),
+            'scout': (36, 36),
+            'striker': (42, 42),
             'cruiser': (80, 80),
             'boss': (220, 220)
         }
         for name, size in sizes.items():
-            path = f"{name}.jpg"
+            path = f"{name}.png"
             if os.path.exists(path):
                 try:
-                    img = pygame.image.load(path).convert()
-                    img.set_colorkey((0, 0, 0))
+                    img = pygame.image.load(path).convert_alpha()
                     scaled_img = pygame.transform.scale(img, size)
                     self.sprites[name] = scaled_img
                 except Exception as e:
@@ -1388,14 +1439,21 @@ class GameEngine:
         t_rect = title_surf.get_rect(center=(WIDTH//2, HEIGHT//3))
         self.screen.blit(title_surf, t_rect)
 
-        # Vector spaceship graphic decoration
-        ship_points = [
-            (WIDTH//2, HEIGHT//3 + 80),
-            (WIDTH//2 - 25, HEIGHT//3 + 140),
-            (WIDTH//2, HEIGHT//3 + 125),
-            (WIDTH//2 + 25, HEIGHT//3 + 140)
-        ]
-        draw_glow_polygon(self.screen, ship_points, CYAN, glow_radius=12, thickness=2)
+        # Spaceship graphic decoration (Sprite with slow float & rock animation)
+        if 'player' in self.sprites:
+            scaled_player = pygame.transform.scale(self.sprites['player'], (120, 120))
+            hover_offset = 6 * math.sin(pygame.time.get_ticks() * 0.003)
+            center_pos = (WIDTH//2, HEIGHT//3 + 120 + int(hover_offset))
+            rocking_angle = 8 * math.sin(pygame.time.get_ticks() * 0.002)
+            draw_rotated_sprite(self.screen, scaled_player, center_pos, rocking_angle)
+        else:
+            ship_points = [
+                (WIDTH//2, HEIGHT//3 + 80),
+                (WIDTH//2 - 25, HEIGHT//3 + 140),
+                (WIDTH//2, HEIGHT//3 + 125),
+                (WIDTH//2 + 25, HEIGHT//3 + 140)
+            ]
+            draw_glow_polygon(self.screen, ship_points, CYAN, glow_radius=12, thickness=2)
 
         # Menu options
         opt_start = self.header_font.render("PRESS [ENTER] TO INITIATE", True, WHITE)
@@ -1476,9 +1534,18 @@ class GameEngine:
         while running:
             # Locked tick rate
             self.clock.tick(FPS)
-            
-            # Reset display screen
-            self.screen.fill(BG_COLOR)
+            # Draw scrolling background
+            if 'background' in self.sprites:
+                if self.state == self.STATE_PLAYING:
+                    self.bg_scroll_y = (self.bg_scroll_y + 0.8) % HEIGHT
+                elif self.state != self.STATE_PAUSED:
+                    self.bg_scroll_y = (self.bg_scroll_y + 0.2) % HEIGHT
+                
+                scroll_y = int(self.bg_scroll_y)
+                self.screen.blit(self.sprites['background'], (0, scroll_y))
+                self.screen.blit(self.sprites['background'], (0, scroll_y - HEIGHT))
+            else:
+                self.screen.fill(BG_COLOR)
 
             # Event handler
             for event in pygame.event.get():
@@ -1549,11 +1616,11 @@ class GameEngine:
                 for pu in self.powerups:
                     pu.draw(game_surf)
                 for enemy in self.enemies:
-                    enemy.draw(game_surf)
+                    enemy.draw(game_surf, self.sprites, self.player)
                 
                 # Only draw player if alive
                 if self.player.health > 0:
-                    self.player.draw(game_surf)
+                    self.player.draw(game_surf, self.sprites)
 
                 for f in self.floaters:
                     f.draw(game_surf)
