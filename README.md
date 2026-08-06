@@ -1,52 +1,170 @@
-# Cyber-Shooter 2088
+# 🚀 Space Shooter
 
-A high-performance, arcade-style space shooter built entirely in Python using Pygame. It features stunning retro-modern vector graphics with neon glow rendering, rich particle systems, screen shake feedback, multiple enemy archetypes, and an epic boss fight.
+![Python](https://img.shields.io/badge/Python-3.x-blue?logo=python)
+![Arcade](https://img.shields.io/badge/Arcade-Game%20Engine-green)
+![Status](https://img.shields.io/badge/Status-Completed-success)
+![License](https://img.shields.io/badge/License-MIT-yellow)
 
-## Key Features
-* **Stunning Neon Glow Aesthetics**: All graphics are drawn programmatically using layered vector shapes and alpha blending to create a true arcade CRT glow—no image asset files required!
-* **Smooth Flight Mechanics**: Keyboard-driven spaceship controls with physical inertia and visual bank-tilting.
-* **Upgrades & Combat**: 4 weapon tiers (Single, Double, Spread, and Quad-Beam) and power-ups (Shield Recharging, Weapon Upgrades, Hull Repair).
-* **Multiple Enemy Types**: 
-  * *Scouts*: Wavy sine-wave movement patterns.
-  * *Strikers*: Aggressively track the player and shoot targeted lasers.
-  * *Cruisers*: Heavy tank battleships shooting wide yellow laser spreads.
-  * *Dreadnought Boss*: Spawns at 3000 points with multiple phase triggers, warning alarms, and screen-clearing bullet hell patterns.
-* **On-the-fly Audio Synthesis**: Generates retro synth sound effects dynamically using math formulas. Silent fallback mode if no audio hardware is found.
-* **Persistent High Scores**: Saves your high score locally in a text file.
+An arcade-style 2D Space Shooter built in **Python** using the **Arcade** game development library.
 
-## Setup Instructions
+Pilot your spaceship, destroy incoming enemies, survive as long as possible, and achieve the highest score while avoiding enemy collisions.
 
-### 1. Install Python
-Ensure Python (version 3.8 or higher) is installed on your system. You can check this by running in your terminal/powershell:
+---
+
+##  Gameplay
+
+<p align="center">
+  <img src="assets/gameplay.gif" alt="Gameplay GIF" width="800">
+</p>
+
+---
+
+##  Screenshots
+
+<p align="center">
+  <img src="assets/menu.png" alt="Main Menu" width="48%">
+  <img src="assets/defeatmenu.png" alt="Defeat Screen" width="48%">
+</p>
+
+---
+
+##  Features
+
+###  Gameplay
+- Smooth player movement
+- Real-time enemy spawning
+- Projectile shooting system
+- Collision detection
+- Score tracking
+- Lives/health system
+- Game Over screen
+- Main Menu screen
+
+###  Visuals
+- Custom game sprites
+- Animated gameplay
+- Responsive UI
+- Background graphics
+- Explosion effects
+
+###  Audio
+- Background music
+- Shooting sound effects
+- Explosion sound effects
+
+###  Programming Concepts
+- Object-Oriented Programming
+- Event-driven game loop
+- Sprite management
+- Collision detection algorithms
+- Keyboard input handling
+- Random enemy generation
+- Game state management
+
+---
+
+##  Built With
+
+| Technology | Purpose |
+|------------|---------|
+| Python | Programming Language |
+| Arcade | Game Development Framework |
+| Pyglet | Rendering & Window Management |
+
+---
+
+##  Controls
+
+| Key | Action |
+|-----|--------|
+| ⬅️ Left Arrow | Move Left |
+| ➡️ Right Arrow | Move Right |
+| Spacebar | Shoot |
+| Esc | Exit Game |
+
+---
+
+##  Getting Started
+
+### Clone the repository
+
 ```bash
-python --version
+git clone https://github.com/avika677/space_shooter.git
 ```
 
-### 2. Install Pygame (or Pygame-CE)
-We recommend **Pygame Community Edition (`pygame-ce`)** for better rendering speeds, but standard `pygame` works as well. Install it by running the requirements file:
+### Navigate into the project
+
+```bash
+cd space_shooter
+```
+
+### Install dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
-*(Or manually install via `pip install pygame-ce`)*
 
-### 3. Run the Game
-Double-click `game.py` or run it from VSCode / terminal:
+### Run the game
+
 ```bash
 python game.py
 ```
 
-## Game Controls
+---
 
-| Key | Action |
-| --- | --- |
-| **W / S / A / D** or **Arrow Keys** | Fly (Move spaceship with momentum) |
-| **Spacebar** | Fire laser cannon (Hold to fire continuously) |
-| **P** | Pause / Resume the game |
-| **Enter** | Start game (from Menu) / Respawn (from Game Over) |
-| **C** | View controls and settings (from Menu) |
-| **Escape** | Quit game (or return to menu from gameplay) |
+##  Project Structure
 
-## Customization & Modding
-Since the game is programmatically rendered, you can easily change colors, spaceship dimensions, and behaviors inside `game.py` without needing graphics software!
-* Check `BG_COLOR`, `CYAN`, `MAGENTA`, etc. at the top of the file to tweak the neon themes.
-* Speed and health properties are highly modular. Tweak `Player` or `Enemy` subclasses to make the game easier, harder, or faster.
+```
+space_shooter/
+│
+├── assets/
+│   ├── gameplay.gif
+│   ├── menu.png
+│   └── defeatmenu.png
+│
+├── game.py
+├── requirements.txt
+├── README.md
+└── ...
+```
+
+---
+
+##  Future Improvements
+
+- Boss battles
+- Multiple enemy types
+- Power-ups
+- High-score saving/
+- Difficulty progression
+- Pause menu
+- Multiple levels
+
+---
+
+##  What I Learned
+
+While building this project, I gained hands-on experience with:
+
+- Object-Oriented Programming
+- Building a complete game loop
+- Sprite rendering
+- Collision detection
+- Event handling
+- Managing game states
+- Python game development using Arcade
+- Structuring a complete software project
+
+---
+
+##  Repository
+
+If you enjoyed this project or found it useful, consider giving it a ⭐ on GitHub!
+
+---
+
+##  Author
+
+**Avika Saxena**
+
+Computer Science Student | Python Developer | Aspiring AI & Software Engineer
